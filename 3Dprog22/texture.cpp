@@ -9,7 +9,7 @@ textureID = 0; // texture ID
 width = 0; // width and height of texture
 height = 0;
 bitDepth = 0; // pixel size
-fileLocation = "/Texture/wall.jpg"; // where the file is located in your project folder //
+fileLocation = "../Texture/wall.jpg"; // where the file is located in your project folder //
 //example :: /texture/wood.jpg
 }
 
@@ -78,5 +78,5 @@ textureID = 0;
 width = 0;
 height = 0;
 bitDepth = 0;
-fileLocation = "/Texture/wall.jpg";
+fileLocation = "../Texture/wall.jpg";
 }

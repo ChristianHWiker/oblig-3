@@ -79,11 +79,11 @@ RenderWindow::RenderWindow(const QSurfaceFormat &format, MainWindow *mainWindow)
     mVmatrix->setToIdentity();
 
 
-//    void setupTextureShader(int shaderIndex);
-//    GLint mMatrixUniform{-1};
-//    GLint vMatrixUniform{-1};
-//    GLint pMatrixUniform{-1};
-//    GLint mTextureUniform{-1};
+    void setupTextureShader(int shaderIndex);
+    GLint mMatrixUniform{-1};
+    GLint vMatrixUniform{-1};
+    GLint pMatrixUniform{-1};
+    GLint mTextureUniform{-1};
 
 //    Texture *mTexture[4]{nullptr};
 //    Shader *mShaderProgram[4]{nullptr};
@@ -190,18 +190,23 @@ void RenderWindow::init()
     mLogger->logText(tempString);
 
 
-    mShaderProgram[0] = new Shader("../3Dprog22/plainvertex.vert","../3Dprog22/plainshader.frag");
+    mShaderProgram.push_back(new Shader("../3Dprog22/plainvertex.vert","../3Dprog22/plainshader.frag"));
     //QDebug() << "Plain shader program id: " << mShaderProgram[0]->getProgram();
-    mShaderProgram[1] = new Shader("../3Dprog22/texturevertex.vert", "../3Dprog22/texturefragment.frag ");
+    mShaderProgram.push_back(new Shader("../3Dprog22/texturevertex.vert", "../3Dprog22/texturefragment.frag "));
     //QDebug()<<"Rexture shader program id: " << mShaderProgram[1]->getProgram();
+    mShaderProgram.push_back(new Shader("../3Dprog22/Phong.vert", "../3Dprog22/Phong.frag "));
 
-    setupPlainShader(0);
-    setupTextureShader(1);
 
-    //******texture stuff: ****************
+for(int i = 0; i < mShaderProgram.size(); i++)
+{
+    setupPlainShader(i);
+}
 
-    wallTexture = new Texture((char*)("../Texture/wall"));
-    wallTexture->loadTexture();
+
+
+   wallTexture = new Texture("../Texture/wall.jpg");
+   wallTexture->loadTexture();
+  // wallTexture->useTexture();
    //mTexture[1] = new Texture("../Texture/wall");
 
 //    glActiveTexture(GL_TEXTURE0);
@@ -237,10 +242,12 @@ void RenderWindow::init()
     // The uniform is used in the render() function to send the model matrix to the shader
     // Flere matriser her! Skal legges inn i kameraklasse
 
-
-//       mMatrixUniform = glGetUniformLocation( mShaderProgram->getProgram(), "matrix" );
-//       mPMatrixUniform = glGetUniformLocation( mShaderProgram->getProgram(), "pmatrix" );
-//       mVMatrixUniform = glGetUniformLocation( mShaderProgram->getProgram(), "vmatrix" );
+    for (int i = 0; i < mShaderProgram.size(); i++)
+    {
+      mMatrixUniform = glGetUniformLocation( mShaderProgram[i]->getProgram(), "matrix" );
+      mPMatrixUniform = glGetUniformLocation( mShaderProgram[i]->getProgram(), "pmatrix" );
+      mVMatrixUniform = glGetUniformLocation( mShaderProgram[i]->getProgram(), "vmatrix" );
+    }
 
 
     for (auto it=mObjects.begin(); it!= mObjects.end(); it++)
@@ -276,15 +283,23 @@ Point* MoveObject(float xValue)
 }
 
 void RenderWindow::setupPlainShader(int shaderIndex){
-    mMatrixUniform0= glGetUniformLocation(mShaderProgram[shaderIndex]->getProgram(),"mMatrix");
-    vMatrixUniform0= glGetUniformLocation(mShaderProgram[shaderIndex]->getProgram(),"vMatrix");
-    pMatrixUniform0= glGetUniformLocation(mShaderProgram[shaderIndex]->getProgram(),"pMatrix");
+    mMatrixUniform = glGetUniformLocation(mShaderProgram[shaderIndex]->getProgram(),"mMatrix");
+    mVMatrixUniform = glGetUniformLocation(mShaderProgram[shaderIndex]->getProgram(),"vMatrix");
+    mPMatrixUniform = glGetUniformLocation(mShaderProgram[shaderIndex]->getProgram(),"pMatrix");
+    mTextureUniform = glGetUniformLocation(mShaderProgram[shaderIndex]->getProgram(), "textureSampler");
 }
 
 void RenderWindow::setupTextureShader(int shaderIndex){
     mMatrixUniform1 = glGetUniformLocation(mShaderProgram[shaderIndex]->getProgram(), "mMatrix");
     vMatrixUniform1 = glGetUniformLocation(mShaderProgram[shaderIndex]->getProgram(), "vMatrix");
     pMatrixUniform1 = glGetUniformLocation(mShaderProgram[shaderIndex]->getProgram(), "pMatrix");
+    mTextureUniform = glGetUniformLocation(mShaderProgram[shaderIndex]->getProgram(), "textureSampler");
+}
+
+void RenderWindow::setupPhongShader(int shaderIndex){
+    mMatrixUniform2 = glGetUniformLocation(mShaderProgram[shaderIndex]->getProgram(), "mMatrix");
+    vMatrixUniform2 = glGetUniformLocation(mShaderProgram[shaderIndex]->getProgram(), "vMatrix");
+    pMatrixUniform2 = glGetUniformLocation(mShaderProgram[shaderIndex]->getProgram(), "pMatrix");
     mTextureUniform = glGetUniformLocation(mShaderProgram[shaderIndex]->getProgram(), "textureSampler");
 }
 
@@ -328,24 +343,24 @@ void RenderWindow::render()
 
 
     //draws object
-    {
-        glUseProgram(mShaderProgram[0]->getProgram());
+//    {
+//        glUseProgram(mShaderProgram[0]->getProgram());
 
-        glUniformMatrix4fv(vMatrixUniform0,1,GL_TRUE, mCurrentCamera->mVmatrix.constData());
-        glUniformMatrix4fv(pMatrixUniform0,1,GL_TRUE, mCurrentCamera->mPmatrix.constData());
-        glUniformMatrix4fv(mMatrixUniform0,1,GL_TRUE, mVisualObjects[0]->mMatrix.constData());
+//        glUniformMatrix4fv(vMatrixUniform0,1,GL_TRUE, mCurrentCamera->mVmatrix.constData());
+//        glUniformMatrix4fv(pMatrixUniform0,1,GL_TRUE, mCurrentCamera->mPmatrix.constData());
+//        glUniformMatrix4fv(mMatrixUniform0,1,GL_TRUE, mVisualObjects[0]->mMatrix.constData());
 
-        mVisualObjects[0]->draw();
+//        mVisualObjects[0]->draw();
 
-        glUseProgram(mShaderProgram[1]->getProgram());
-        glUniformMatrix4fv(vMatrixUniform0,1,GL_TRUE, mCurrentCamera->mVmatrix.constData());
-        glUniformMatrix4fv(pMatrixUniform0,1,GL_TRUE, mCurrentCamera->mPmatrix.constData());
-        glUniformMatrix4fv(mMatrixUniform0,1,GL_TRUE, mVisualObjects[0]->mMatrix.constData());
-        glUniform1i(mTextureUniform,1);
-        mVisualObjects[1]->draw();
-        mVisualObjects[1]->mMatrix.translate(.001f, .001f, -.001f);
+//        glUseProgram(mShaderProgram[1]->getProgram());
+//        glUniformMatrix4fv(vMatrixUniform0,1,GL_TRUE, mCurrentCamera->mVmatrix.constData());
+//        glUniformMatrix4fv(pMatrixUniform0,1,GL_TRUE, mCurrentCamera->mPmatrix.constData());
+//        glUniformMatrix4fv(mMatrixUniform0,1,GL_TRUE, mVisualObjects[0]->mMatrix.constData());
+//        glUniform1i(mTextureUniform,1);
+//        mVisualObjects[1]->draw();
+//        mVisualObjects[1]->mMatrix.translate(.001f, .001f, -.001f);
 
-    }
+//    }
 
 
     //to open the door
@@ -377,17 +392,36 @@ void RenderWindow::render()
     //clear the screen for each redraw
     glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
+    wallTexture->useTexture();
+
     //what shader to use
-    //glUseProgram(mShaderProgram[shaderIndex]->getProgram());
+
+    for (int i = 0; i < mShaderProgram.size() ; i++)
+    {
+    glUseProgram(mShaderProgram[i]->getProgram());
+    glUniformMatrix4fv(vMatrixUniform0,1,GL_TRUE, mCurrentCamera->mVmatrix.constData());
+    glUniformMatrix4fv(pMatrixUniform0,1,GL_TRUE, mCurrentCamera->mPmatrix.constData());
+    if (i == 1)
+    {
+        glUniform1i(mTextureUniform,1);
+    }
+    }
+
+    for (int i = 0; i < mVisualObjects.size() ; i++)
+    {
+        glUniformMatrix4fv(mMatrixUniform0,1,GL_TRUE, mVisualObjects[0]->mMatrix.constData());
+        mVisualObjects[i]->draw();
+    }
+
 
     int i{};
 
-    for (auto it=mObjects.begin(); it!= mObjects.end(); it++)
-    {
+    //for (auto it=mObjects.begin(); it!= mObjects.end(); it++)
+   // {
 //        (*it)->setTransformation(posArray[i], posArray[i+1], posArray[i+2] );
 //        i++;
-        (*it)->draw();
-    }
+  //      (*it)->draw();
+  //  }
 
     //cube.draw();
     //graph.draw();

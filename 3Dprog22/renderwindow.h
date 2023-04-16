@@ -47,6 +47,7 @@ private:
     std::vector<InteractiveObject*> IntObjects;
 
 
+
     bool camera = false;
     bool open = false;
 
@@ -128,9 +129,14 @@ private:
     GLint pMatrixUniform1{-1};
     GLint mTextureUniform{-1};
 
+    void setupPhongShader(int shaderIndex);
+    GLint mMatrixUniform2{-1};
+    GLint vMatrixUniform2{-1};
+    GLint pMatrixUniform2{-1};
+
     Texture *mTexture[4]{nullptr};
     Texture *wallTexture;
-    Shader  *mShaderProgram[4]{nullptr};
+
 
     Camera *mCurrentCamera{nullptr};
 
@@ -139,6 +145,8 @@ private:
     std::vector<VisualObject*> mObjects;
 
     std::vector<VisualObject*> trophies;
+
+    std::vector<Shader*> mShaderProgram;
 
     QTimer *mRenderTimer{nullptr};           //timer that drives the gameloop
     QElapsedTimer mTimeStart;               //time variable that reads the calculated FPS
